@@ -9,8 +9,16 @@ public class RationalNumber implements Comparable<RationalNumber> {
 		
 		int GCD = findGCD(numerator, denominator);
 
-		this.numerator = numerator/GCD;
-		this.denominator = denominator/GCD;
+		numerator = numerator/GCD;
+		denominator = denominator/GCD;
+
+		if (denominator < 0) {
+			denominator = -denominator;
+			numerator = -numerator;
+		}
+
+		this.numerator = numerator;
+		this.denominator = denominator;
 	}
 
 	@Override
@@ -35,6 +43,14 @@ public class RationalNumber implements Comparable<RationalNumber> {
 		return numerator + "/" + denominator;
 	}
 
+	public int getNumerator() {
+		return numerator;
+	}
+
+	public int getDenominator() {
+		return denominator;
+	}
+
 	public void printDecimal() {
 		System.out.println((float) numerator / (float) denominator);
 	}
@@ -55,7 +71,7 @@ public class RationalNumber implements Comparable<RationalNumber> {
 	}
 
 	public RationalNumber subtract(RationalNumber other) {
-		return add(new RationalNumber(-other.numerator, other.denominator));
+		return add(other.negate());
 	}
 
 	public RationalNumber multiply(RationalNumber other) {
@@ -65,8 +81,19 @@ public class RationalNumber implements Comparable<RationalNumber> {
 		return new RationalNumber(numerator, denominator);
 	}
 
+	public RationalNumber exponentiate(int n) {
+		int numerator = (int) Math.pow(this.numerator, n);
+		int denominator = (int) Math.pow(this.denominator, n);
+
+		return new RationalNumber(numerator, denominator);
+	}
+
 	public RationalNumber divide(RationalNumber other) {
 		return multiply(other.reciprocal());
+	}
+
+	private RationalNumber negate() {
+		return new RationalNumber(-numerator, denominator);
 	}
 
 	private int findGCD(int a, int b) {
@@ -75,26 +102,41 @@ public class RationalNumber implements Comparable<RationalNumber> {
 		if (b == 0) {
 			return a;
 		}
-
 		return findGCD(b, a % b);
 	}
 
 	public static void main(String[] args) {
 		RationalNumber num = new RationalNumber(2, 4);
-		num.printDecimal();
-		num.printFraction();
+		assert num.getNumerator() == 1 && num.getDenominator() == 2;
+		
+		RationalNumber num2 = new RationalNumber(1, -10);
+		assert num2.getNumerator() == -1 && num2.getDenominator() == 10;
+
+		RationalNumber num3 = new RationalNumber(-5, -20);
+		assert num3.getNumerator() == 1 && num3.getDenominator() == 4;
+
 		RationalNumber sum = num.add(new RationalNumber(1, 3));
-		sum.printDecimal();
-		sum.printFraction();
+		assert sum.getNumerator() == 5 && sum.getDenominator() == 6;
+
+		RationalNumber difference = num.subtract(new RationalNumber(1, 3));
+		assert difference.getNumerator() == 1 && difference.getDenominator() == 6;
+
 		RationalNumber product = num.multiply(new RationalNumber(1, 5));
-		product.printDecimal();
-		product.printFraction();
+		assert product.getNumerator() == 1 && product.getDenominator() == 10;
+
 		RationalNumber quotient = num.divide(new RationalNumber(1, 5));
-		quotient.printDecimal();
-		quotient.printFraction();
-		// assert num.equals(num.equals(new RationalNumber(5, 10)));
-		// assert num.compareTo(new RationalNumber(5, 9)) == 0;
-		System.out.println(num.equals(new RationalNumber(5, 10)));
-		System.out.println(num.compareTo(new RationalNumber(5, 9)));
+		assert quotient.getNumerator() == 5 && quotient.getDenominator() == 2;
+
+		RationalNumber power = num.exponentiate(5);
+		assert power.getNumerator() == 1 && power.getDenominator() == 32;
+
+		RationalNumber power2 = (new RationalNumber(-2, 3)).exponentiate(4);
+		assert power2.getNumerator() == 16 && power2.getDenominator() == 81;
+
+		assert num.equals(new RationalNumber(5, 10));
+		assert !num.equals(new RationalNumber(5, 11));
+		assert num.compareTo(new RationalNumber(5, 9)) == -1;
+		assert num.compareTo(new RationalNumber(5, 10)) == 0;
+		assert num.compareTo(new RationalNumber(5, 11)) == 1;
 	}
 }
